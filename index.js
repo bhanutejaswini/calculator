@@ -64,6 +64,15 @@ function handleOperations(e) {
   if (e.target.classList.contains("number")) {
     if (displayVal === "0" || error) displayEle.value = "";
 
+    if (e.target.textContent === ".") {
+      if (op) {
+        let ind = displayVal.indexOf(op);
+        if (displayVal.slice(ind + 1).includes(".")) return;
+      } else {
+        if (displayVal.includes(".")) return;
+      }
+    }
+
     displayEle.value += e.target.textContent;
   } else if (e.target.classList.contains("operator")) {
     if (!num1 || !op) {
