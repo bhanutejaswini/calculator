@@ -8,7 +8,8 @@ const displayEle = document.querySelector(".display");
 
 let num1 = null,
   op = null,
-  num2 = null;
+  num2 = null,
+  error = false;
 
 function add(a, b) {
   return a + b;
@@ -23,6 +24,11 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
+  if (b === 0) {
+    error = true;
+    return "Division by zero is not valid!";
+  }
+
   return a / b;
 }
 
@@ -48,31 +54,50 @@ function operate(num1, num2, op) {
 }
 
 function handleOperations(e) {
+  if (error) {
+    displayEle.value = "";
+    error = false;
+  }
+
+  let displayVal = displayEle.value;
+
   if (e.target.classList.contains("number")) {
+    if (displayVal === "0" || error) displayEle.value = "";
+
     displayEle.value += e.target.textContent;
   } else if (e.target.classList.contains("operator")) {
-    let displayVal = displayEle.value;
-    if (!num1) {
+    if (!num1 || !op) {
       num1 = Number(displayVal);
       op = e.target.textContent;
+
       displayEle.value += e.target.textContent;
-    } else {
-      let ind = displayVal.indexOf(op);
-      num2 = Number(displayVal.slice(ind + 1));
+    } else if (op) {
+      num2 = Number(displayVal.split(op)[1]);
       let res = operate(num1, num2, op);
-      num1 = res;
-      num2 = null;
+
+      if (error) {
+        num1 = null;
+        num2 = null;
+        op = null;
+      } else {
+        num1 = res;
+        num2 = null;
+      }
+
+      displayEle.value = res;
+
       op = e.target.textContent;
-      displayEle.value = res + op;
+      displayEle.value += op;
     }
   } else if (e.target.classList.contains("equality")) {
-    let displayVal = displayEle.value;
-    let ind = displayVal.indexOf(op);
-    num2 = Number(displayVal.slice(ind + 1));
-    let res = operate(num1, num2, op);
-    num1 = res;
-    num2 = null;
-    displayEle.value = res;
+    if (num1 !== null && op !== null) {
+      num2 = Number(displayVal.split(op)[1]);
+      let res = operate(num1, num2, op);
+      displayEle.value = res;
+      num1 = res;
+      num2 = null;
+      op = null;
+    }
   }
 }
 
